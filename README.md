@@ -6,7 +6,7 @@
 
 # Link
 
-[NewsForce 앱스토어 링크](https://apps.apple.com/app/filmnoise/id6445938664)
+[filmNoise 앱스토어 링크](https://apps.apple.com/app/filmnoise/id6445938664)
 
 [첫 배포 이후 블로그 회고 링크](https://velog.io/@simonyain/series/filmNoise-개발-과정)
 
@@ -25,8 +25,8 @@
 ------
 
 # 기능 구현
-
-
+- 
+- 
 
 ------
 
