@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "flashSelected.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

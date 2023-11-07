@@ -1,0 +1,618 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		210EF7C629BF2C460098BF4E /* NVActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 210EF7C529BF2C460098BF4E /* NVActivityIndicatorView */; };
+		211142F12991406600D3A996 /* CameraFilterTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 211142F02991406600D3A996 /* CameraFilterTableViewController.swift */; };
+		211142F32991596900D3A996 /* CameraFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 211142F22991596900D3A996 /* CameraFilterViewController.swift */; };
+		21123CDA29B4CFC600E86271 /* SFDigitalReadout-HeavyObliq.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21123CD929B4CFC600E86271 /* SFDigitalReadout-HeavyObliq.ttf */; };
+		212988E929924B67003607D9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212988E829924B67003607D9 /* CustomTableViewCell.swift */; };
+		212B7A6E298F82E800B228AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212B7A6D298F82E800B228AF /* AppDelegate.swift */; };
+		212B7A70298F82E900B228AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212B7A6F298F82E900B228AF /* SceneDelegate.swift */; };
+		212B7A72298F82E900B228AF /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212B7A71298F82E900B228AF /* CameraViewController.swift */; };
+		212B7A75298F82E900B228AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 212B7A73298F82E900B228AF /* Main.storyboard */; };
+		212B7A77298F82EA00B228AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 212B7A76298F82EA00B228AF /* Assets.xcassets */; };
+		212B7A7A298F82EA00B228AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 212B7A78298F82EA00B228AF /* LaunchScreen.storyboard */; };
+		2147697529C42A8300B56CB8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 2147697429C42A8300B56CB8 /* Settings.bundle */; };
+		21507E4D29A710910029B088 /* AgfaAPX400Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21507E4C29A710910029B088 /* AgfaAPX400Filter.swift */; };
+		21507E4F29A7109E0029B088 /* AgfaAPX400.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21507E4E29A7109E0029B088 /* AgfaAPX400.metal */; };
+		216BAAF529AC49C200199821 /* EvangelionFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216BAAF429AC49C200199821 /* EvangelionFilter.swift */; };
+		216BAAF729AC49CB00199821 /* Evangelion.metal in Sources */ = {isa = PBXBuildFile; fileRef = 216BAAF629AC49CB00199821 /* Evangelion.metal */; };
+		219C7591299BE03600193DD6 /* FilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */; };
+		21B7C3B829A1339A00CA9CD2 /* FilterFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7C3B729A1339A00CA9CD2 /* FilterFunctions.swift */; };
+		21C39C1029978EED00A17F80 /* FilterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C39C0F29978EED00A17F80 /* FilterData.swift */; };
+		21C39C1229978F6600A17F80 /* FilterDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C39C1129978F6600A17F80 /* FilterDataManager.swift */; };
+		21D1CAFA2AFA8B870023B9E8 /* APIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21D1CAF92AFA8B870023B9E8 /* APIKey.swift */; };
+		21D1CAFC2AFA8B930023B9E8 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 21D1CAFB2AFA8B930023B9E8 /* .gitignore */; };
+		21D2E98129C2035E00CF2023 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 21D2E98029C2035E00CF2023 /* GoogleMobileAds */; };
+		21F2F7602AF88A540001ABF8 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 21F2F75F2AF88A540001ABF8 /* FirebaseCrashlytics */; };
+		21F8539C29B37A160035326C /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 21F8539B29B37A160035326C /* FirebaseAnalyticsWithoutAdIdSupport */; };
+		21F8539E29B37F3D0035326C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 21F8539D29B37F3D0035326C /* GoogleService-Info.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		211142F02991406600D3A996 /* CameraFilterTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFilterTableViewController.swift; sourceTree = "<group>"; };
+		211142F22991596900D3A996 /* CameraFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFilterViewController.swift; sourceTree = "<group>"; };
+		21123CD929B4CFC600E86271 /* SFDigitalReadout-HeavyObliq.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFDigitalReadout-HeavyObliq.ttf"; sourceTree = "<group>"; };
+		212988E829924B67003607D9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		212B7A6A298F82E800B228AF /* filmNoise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = filmNoise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		212B7A6D298F82E800B228AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		212B7A6F298F82E900B228AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		212B7A71298F82E900B228AF /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		212B7A74298F82E900B228AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		212B7A76298F82EA00B228AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		212B7A79298F82EA00B228AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		212B7A7B298F82EA00B228AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2147697429C42A8300B56CB8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		21507E4C29A710910029B088 /* AgfaAPX400Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgfaAPX400Filter.swift; sourceTree = "<group>"; };
+		21507E4E29A7109E0029B088 /* AgfaAPX400.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AgfaAPX400.metal; sourceTree = "<group>"; };
+		216BAAF429AC49C200199821 /* EvangelionFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvangelionFilter.swift; sourceTree = "<group>"; };
+		216BAAF629AC49CB00199821 /* Evangelion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Evangelion.metal; sourceTree = "<group>"; };
+		219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCollectionViewCell.swift; sourceTree = "<group>"; };
+		21B7C3B729A1339A00CA9CD2 /* FilterFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterFunctions.swift; sourceTree = "<group>"; };
+		21C39C0F29978EED00A17F80 /* FilterData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterData.swift; sourceTree = "<group>"; };
+		21C39C1129978F6600A17F80 /* FilterDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterDataManager.swift; sourceTree = "<group>"; };
+		21CEA3B329BEF42A00CB4667 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		21D1CAF92AFA8B870023B9E8 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
+		21D1CAFB2AFA8B930023B9E8 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		21F8539D29B37F3D0035326C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		212B7A67298F82E800B228AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21D2E98129C2035E00CF2023 /* GoogleMobileAds in Frameworks */,
+				21F2F7602AF88A540001ABF8 /* FirebaseCrashlytics in Frameworks */,
+				210EF7C629BF2C460098BF4E /* NVActivityIndicatorView in Frameworks */,
+				21F8539C29B37A160035326C /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		211142E52990E0B600D3A996 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				212B7A71298F82E900B228AF /* CameraViewController.swift */,
+				211142F02991406600D3A996 /* CameraFilterTableViewController.swift */,
+				211142F22991596900D3A996 /* CameraFilterViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		211142E62990E1CD00D3A996 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				212B7A73298F82E900B228AF /* Main.storyboard */,
+				212988E829924B67003607D9 /* CustomTableViewCell.swift */,
+				219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		211142EB2990EAF100D3A996 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				21B7C3B729A1339A00CA9CD2 /* FilterFunctions.swift */,
+				21C39C0F29978EED00A17F80 /* FilterData.swift */,
+				21C39C1129978F6600A17F80 /* FilterDataManager.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		21123CDD29B4CFF400E86271 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				21123CD929B4CFC600E86271 /* SFDigitalReadout-HeavyObliq.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		212B7A61298F82E800B228AF = {
+			isa = PBXGroup;
+			children = (
+				212B7A6C298F82E800B228AF /* filmNoise */,
+				212B7A6B298F82E800B228AF /* Products */,
+				21F2F75E2AF88A4D0001ABF8 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		212B7A6B298F82E800B228AF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				212B7A6A298F82E800B228AF /* filmNoise.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		212B7A6C298F82E800B228AF /* filmNoise */ = {
+			isa = PBXGroup;
+			children = (
+				212B7A6D298F82E800B228AF /* AppDelegate.swift */,
+				212B7A6F298F82E900B228AF /* SceneDelegate.swift */,
+				21D1CAF92AFA8B870023B9E8 /* APIKey.swift */,
+				21D1CAFB2AFA8B930023B9E8 /* .gitignore */,
+				21945CBF29A3A70200D0C6FF /* CustomFilters */,
+				211142EB2990EAF100D3A996 /* Models */,
+				211142E62990E1CD00D3A996 /* Views */,
+				211142E52990E0B600D3A996 /* Controllers */,
+				212B7A76298F82EA00B228AF /* Assets.xcassets */,
+				21F8539D29B37F3D0035326C /* GoogleService-Info.plist */,
+				21123CDD29B4CFF400E86271 /* Fonts */,
+				212B7A78298F82EA00B228AF /* LaunchScreen.storyboard */,
+				212B7A7B298F82EA00B228AF /* Info.plist */,
+				2147697429C42A8300B56CB8 /* Settings.bundle */,
+			);
+			path = filmNoise;
+			sourceTree = "<group>";
+		};
+		21507E5029A710A40029B088 /* AgfaAPX400 */ = {
+			isa = PBXGroup;
+			children = (
+				21507E4E29A7109E0029B088 /* AgfaAPX400.metal */,
+				21507E4C29A710910029B088 /* AgfaAPX400Filter.swift */,
+			);
+			path = AgfaAPX400;
+			sourceTree = "<group>";
+		};
+		216BAAF829AC49CF00199821 /* Evangelion */ = {
+			isa = PBXGroup;
+			children = (
+				216BAAF629AC49CB00199821 /* Evangelion.metal */,
+				216BAAF429AC49C200199821 /* EvangelionFilter.swift */,
+			);
+			path = Evangelion;
+			sourceTree = "<group>";
+		};
+		21945CBF29A3A70200D0C6FF /* CustomFilters */ = {
+			isa = PBXGroup;
+			children = (
+				21507E5029A710A40029B088 /* AgfaAPX400 */,
+				216BAAF829AC49CF00199821 /* Evangelion */,
+			);
+			path = CustomFilters;
+			sourceTree = "<group>";
+		};
+		21F2F75E2AF88A4D0001ABF8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		212B7A69298F82E800B228AF /* filmNoise */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 212B7A7E298F82EA00B228AF /* Build configuration list for PBXNativeTarget "filmNoise" */;
+			buildPhases = (
+				212B7A66298F82E800B228AF /* Sources */,
+				212B7A67298F82E800B228AF /* Frameworks */,
+				212B7A68298F82E800B228AF /* Resources */,
+				21F2F7612AF88ACF0001ABF8 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = filmNoise;
+			packageProductDependencies = (
+				21F8539B29B37A160035326C /* FirebaseAnalyticsWithoutAdIdSupport */,
+				210EF7C529BF2C460098BF4E /* NVActivityIndicatorView */,
+				21D2E98029C2035E00CF2023 /* GoogleMobileAds */,
+				21F2F75F2AF88A540001ABF8 /* FirebaseCrashlytics */,
+			);
+			productName = cameraFilterApp;
+			productReference = 212B7A6A298F82E800B228AF /* filmNoise.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		212B7A62298F82E800B228AF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					212B7A69298F82E800B228AF = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = 212B7A65298F82E800B228AF /* Build configuration list for PBXProject "filmNoise" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 212B7A61298F82E800B228AF;
+			packageReferences = (
+				21F8539A29B37A160035326C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				210EF7C429BF2C460098BF4E /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */,
+				21D2E97F29C2035E00CF2023 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
+			productRefGroup = 212B7A6B298F82E800B228AF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				212B7A69298F82E800B228AF /* filmNoise */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		212B7A68298F82E800B228AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				212B7A7A298F82EA00B228AF /* LaunchScreen.storyboard in Resources */,
+				21D1CAFC2AFA8B930023B9E8 /* .gitignore in Resources */,
+				21F8539E29B37F3D0035326C /* GoogleService-Info.plist in Resources */,
+				212B7A77298F82EA00B228AF /* Assets.xcassets in Resources */,
+				212B7A75298F82E900B228AF /* Main.storyboard in Resources */,
+				2147697529C42A8300B56CB8 /* Settings.bundle in Resources */,
+				21123CDA29B4CFC600E86271 /* SFDigitalReadout-HeavyObliq.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		21F2F7612AF88ACF0001ABF8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		212B7A66298F82E800B228AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				212B7A72298F82E900B228AF /* CameraViewController.swift in Sources */,
+				21C39C1229978F6600A17F80 /* FilterDataManager.swift in Sources */,
+				21507E4F29A7109E0029B088 /* AgfaAPX400.metal in Sources */,
+				21507E4D29A710910029B088 /* AgfaAPX400Filter.swift in Sources */,
+				21D1CAFA2AFA8B870023B9E8 /* APIKey.swift in Sources */,
+				211142F32991596900D3A996 /* CameraFilterViewController.swift in Sources */,
+				212988E929924B67003607D9 /* CustomTableViewCell.swift in Sources */,
+				219C7591299BE03600193DD6 /* FilterCollectionViewCell.swift in Sources */,
+				216BAAF529AC49C200199821 /* EvangelionFilter.swift in Sources */,
+				211142F12991406600D3A996 /* CameraFilterTableViewController.swift in Sources */,
+				21B7C3B829A1339A00CA9CD2 /* FilterFunctions.swift in Sources */,
+				21C39C1029978EED00A17F80 /* FilterData.swift in Sources */,
+				216BAAF729AC49CB00199821 /* Evangelion.metal in Sources */,
+				212B7A6E298F82E800B228AF /* AppDelegate.swift in Sources */,
+				212B7A70298F82E900B228AF /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		212B7A73298F82E900B228AF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				212B7A74298F82E900B228AF /* Base */,
+				21CEA3B329BEF42A00CB4667 /* en */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		212B7A78298F82EA00B228AF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				212B7A79298F82EA00B228AF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		212B7A7C298F82EA00B228AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				MTLLINKER_FLAGS = "-fcikernel";
+				MTL_COMPILER_FLAGS = "-fcikernel";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(HEADER_SEARCH_PATHS)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		212B7A7D298F82EA00B228AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				MTLLINKER_FLAGS = "-fcikernel";
+				MTL_COMPILER_FLAGS = "-fcikernel";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(HEADER_SEARCH_PATHS)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		212B7A7F298F82EA00B228AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PSU86J5852;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = filmNoise/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"앱에서 사진을 찍기 전 Preview 화면을 보거나, 원하는 사진을 촬영하는 데에 필요한 권한입니다.\"";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "\"앱에서 촬영한 사진을 사진첩에 저장하기 위해 필요한 권한입니다.\"";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "\"사용자에게 관련성이 높은 맞춤 광고를 제공하는데 사용됩니다. 추적을 거부해도 광고는 계속해서 표시되지만, 관련성이 떨어질 수 있습니다.\"";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.3.1;
+				MTLLINKER_FLAGS = "-fcikernel";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phillyham24.filmNoise;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		212B7A80298F82EA00B228AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PSU86J5852;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = filmNoise/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"앱에서 사진을 찍기 전 Preview 화면을 보거나, 원하는 사진을 촬영하는 데에 필요한 권한입니다.\"";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "\"앱에서 촬영한 사진을 사진첩에 저장하기 위해 필요한 권한입니다.\"";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "\"사용자에게 관련성이 높은 맞춤 광고를 제공하는데 사용됩니다. 추적을 거부해도 광고는 계속해서 표시되지만, 관련성이 떨어질 수 있습니다.\"";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.3.1;
+				MTLLINKER_FLAGS = "-fcikernel";
+				PRODUCT_BUNDLE_IDENTIFIER = com.phillyham24.filmNoise;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		212B7A65298F82E800B228AF /* Build configuration list for PBXProject "filmNoise" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				212B7A7C298F82EA00B228AF /* Debug */,
+				212B7A7D298F82EA00B228AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		212B7A7E298F82EA00B228AF /* Build configuration list for PBXNativeTarget "filmNoise" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				212B7A7F298F82EA00B228AF /* Debug */,
+				212B7A80298F82EA00B228AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		210EF7C429BF2C460098BF4E /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ninjaprox/NVActivityIndicatorView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		21D2E97F29C2035E00CF2023 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+		21F8539A29B37A160035326C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		210EF7C529BF2C460098BF4E /* NVActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 210EF7C429BF2C460098BF4E /* XCRemoteSwiftPackageReference "NVActivityIndicatorView" */;
+			productName = NVActivityIndicatorView;
+		};
+		21D2E98029C2035E00CF2023 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 21D2E97F29C2035E00CF2023 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		21F2F75F2AF88A540001ABF8 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 21F8539A29B37A160035326C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		21F8539B29B37A160035326C /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 21F8539A29B37A160035326C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsWithoutAdIdSupport;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 212B7A62298F82E800B228AF /* Project object */;
+}
