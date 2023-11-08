@@ -37,7 +37,7 @@
 - `AnalyticsWithoutAdidSupport`와 `Crashlytics`를 활용, UUID 정보 없이도 UI component 활용 통계 및 크래시 정보 수집
 - `ATTrackingManager` 활용하여 광고 권한 얻고 `Admob` 활용해 배너 광고 게재
 
-### 전체적인 촬영 Flow
+### 전체 촬영 Flow
 ![totalFlow](./readMeImage/totalFlow.jpg)
 
 ------
@@ -177,7 +177,8 @@ extension ViewController: MTKViewDelegate {
 
 [WWDC21: Explore Core Image kernel improvements](https://developer.apple.com/videos/play/wwdc2021/10159/)
 
-WWDC의 설명으로는 Metal로 커스텀 CIFilter
+Xcode Build Settings에서 Metal Linker - Build Options에 `-fcikernel`을 추가해서 CIKernel 인식을 할 수 있도록 해준다.
+
 
 
 #### 2. 이미지 프로세싱을 위한 도메인 지식을 활용해 Metal 파일에서 수치를 조정했다.
