@@ -41,20 +41,148 @@
 
 # Trouble Shooting
 
-A)
+### A. CIImage 적용된 데이터를 실시간 스크린으로 보여주기 위해선 AVCaptureVideoPreviewLayer를 활용할 수 없음
+
+실시간 Preview 화면으로 `AVCaptureVideoPreviewLayer`를 `UIView`의 layer로 설정할 수 있지만, 추가 데이터를 적용할 수 없는 특징이 존재한다.
+UIView 대신 MTKView를 활용하면 매 frame을 렌더링하여 화면에 그려내기 전, 필터 데이터를 적용할 수 있다. MTKView는 UIView를 상속하므로 Preview 화면으로의 역할도 가능하다.
+
+MTKView에 최종 결과물을 그려내기 위해선 Metal Rendering Process를 통해 render해야 한다.
+
+- _Metal Rendering Process 준비 과정_
+```swift
+@IBOutlet weak var mtkView: MTKView!
+
+//A GPU in the MetalKit framework, represented as a MTLDevice
+var metalDevice: MTLDevice!
+    
+//a pipeline to send instructions down to MTLDevice
+var metalCommandQueue: MTLCommandQueue!
+    
+//core image for filter
+var ciContext: CIContext!
+    
+//core image with filter data
+var currentCIImage: CIImage?
+
+func setUpMetal() {
+		//fetch the default gpu of the device (only one on iOS devices)
+    metalDevice = MTLCreateSystemDefaultDevice()
+        
+    //setup MTKView's MTLDevice
+    mtkView.device = metalDevice
+        
+    //update MTKView every time there’s a new frame to display
+    //explicit drawing, have to call .draw()
+    mtkView.isPaused = true
+    
+    //command queue to send down instructions to the GPU
+    metalCommandQueue = metalDevice.makeCommandQueue()
+        
+		//send commands to GPU
+    //MTKViewDelegate for responding view's drawing events
+    mtkView.delegate = self
+
+    //sample or perform read/write operations on the textures
+    mtkView.framebufferOnly = false
+}
+
+func setUpCoreImage() {
+		//initialize CIContext instance using Metal device
+    ciContext = CIContext(mtlDevice: metalDevice)
+}
+```
+- _AVCaptureVideoDataOutputSampleBufferDelegate의 captureOutput 메서드에서 원본 image buffer에서 CIImage 추출, MTKViewDelegate의 draw 메서드 호출_
+```swift
+//유저가 특정 필터를 선택할 시, 해당 필터를 담고 있을 변수
+var currentCIImage: CIImage?
+
+extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
+		func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {		
+
+				//get CVImageBuffer out of the sample buffer
+		    guard let cvBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+				    debugPrint("unable to get image from sampleBuffer")
+			      return
+		    }
+		
+				//get CIImage out of the CVImageBuffer
+		    let ciImage = CIImage(cvImageBuffer: cvBuffer)
+
+				//save it in variable to draw in mtkView
+		    self.currentCIImage = ciImage
+
+				//draw on MTKView
+			  mtkView.draw()
+		}
+}
+```
+
+- _MTKViewDelegate의 draw 메서드 수행_
+```swift
+extension ViewController: MTKViewDelegate {
+  //render on screen
+  func draw(in view: MTKView) {
+    //store a reference to each frame
+    guard let commandBuffer = metalCommandQueue.makeCommandBuffer() else { return }
+        
+    //ciImage with filter data to work with
+    guard let ciImage = currentCIImage else { return }
+
+    //make sure currentDrawable object is available
+    //should not be in use by previous draw cycle
+    guard let currentDrawable = view.currentDrawable else { return }
+
+    let widthOfDrawable = view.drawableSize.width
+    let heightOfDrawable = view.drawableSize.height
+        
+    //frame is centered on screen
+    let widthOfciImage = ciImage.extent.width
+    let xOffsetFromBottom = (widthOfDrawable - widthOfciImage)/2
+        
+    let heightOfciImage = ciImage.extent.height
+    let yOffsetFromBottom = (heightOfDrawable - heightOfciImage)/2
+            
+    //render a CIImage into our metal texture
+        
+    //image: CIImage for each frame
+    //texture: rendering it to the screen through mtkView
+    //commandBuffer: instructions sent through commandQueue to GPU
+    //bounds: GCRect to draw the image on the texture
+    //colorSpace: tells CIContext how to interpret color info from CIImage
+    self.ciContext.render(ciImage, to: currentDrawable.texture, commandBuffer: commandBuffer, bounds: CGRect(origin: CGPoint(x: -xOffsetFromBottom, y: -yOffsetFromBottom), size: view.drawableSize), colorSpace: CGColorSpaceCreateDeviceRGB())
+        
+    //register to draw the instructions in the command buffer once it executes
+    commandBuffer.present(currentDrawable)
+        
+    //commit the command to the queue ~ execute
+    commandBuffer.commit()
+  }
+}
+```
 
 -----
 
-B)
+### B. Custom CIFilter 제작
+
+기본 제공되는 CIFilter만 활용하기엔 수치 조정을 직접 할 수 없어서 원하는 색감 표현에 한계가 존재했다. Metal로 직접 CIFilter를 만들어 활용했다.
+WWDC의 Session을 보면서 전체 흐름을 익히고 난 뒤, 이미지 프로세싱을 위한 도메인 지식을 활용해 수치를 조정했다.
+
+[WWDC14: Working with Metal: Overview](https://developer.apple.com/videos/play/wwdc2014/603/)
+[WWDC20: Build Metal-based Core Image kernels with Xcode](https://developer.apple.com/videos/play/wwdc2020/10021/)
+[WWDC21: Explore Core Image kernel improvements](https://developer.apple.com/videos/play/wwdc2021/10159/)
+
+
+
+
 
 
 ------
 
-C)
+### C. 
 
 ------
 
-D)
+### D.
 
 
 ------
