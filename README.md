@@ -581,15 +581,206 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
 
 ------
 
-### D.
+### D. AVCaptureSession input 충돌 문제
 
+`AVCaptureSession`에서 input은 한 프레임에 하나만 가능하다. 따라서 새로운 device type이나 전면 카메라로 변경 시, input 조정이 없다면 여러 input을 넣게되는 문제가 발생한다.
+따라서 전면/후면 카메라 전환과 후면 듀얼/트리플 렌즈에서 전환 시, session의 configuration을 변경하도록 작성했다.
+
+_전면/후면 카메라 전환_
+
+```swift
+@IBAction func switchCameraButtonTapped(_ sender: UIButton) {
+		//reconfigure input
+        captureSession.beginConfiguration()
+        
+		//후면카메라에서 누른 경우: 전면카메라로 전환하기
+        if cameraPosition != .front {
+            captureSession.removeInput(backInput)
+            captureSession.addInput(frontInput)
+
+			//mirror video if front camera
+			videoOutput.connections.first?.isVideoMirrored = true
+			photoOutput.connections.first?.isVideoMirrored = true
+            
+			cameraPosition = .front
+
+			//전면카메라 전환 시 후면 렌즈 선택 숨기기
+			cameraLensButton.setValue(true, forKey: "hidden")
+		} else {
+			//전면카메라에서 누른 경우: 후면카메라로 전환하기
+			captureSession.removeInput(frontInput)
+            captureSession.addInput(backInput)
+            
+            videoOutput.connections.first?.isVideoMirrored = false
+            photoOutput.connections.first?.isVideoMirrored = false
+            
+            cameraPosition = .back
+            
+            //후면카메라 전환 시 렌즈 선택 다시 보이기
+            cameraLensButton.setValue(false, forKey: "hidden")
+		}
+
+		//deal with the connection again for portrait mode
+        videoOutput.connections.first?.videoOrientation = .portrait
+        photoOutput.connections.first?.videoOrientation = .portrait
+        
+        photoOutput.isHighResolutionCaptureEnabled = true
+
+		//commit config
+        captureSession.commitConfiguration()
+}
+
+```
+
+_듀얼/트리플 카메라 전환_
+
+```swift
+@IBAction func cameraLensButtonPressed(_ sender: UIButton) {
+	//reconfigure input
+    captureSession.beginConfiguration()
+        
+	//Create a new input and add it to the session
+    captureSession.removeInput(backInput)		
+
+	guard let newBackInput = try? AVCaptureDeviceInput(device: backCamera) else {
+		fatalError("could not create new input device from chainging camera lens")
+    }
+    backInput = newBackInput
+        
+    captureSession.addInput(self.backInput)		
+
+    videoOutput.connections.first?.videoOrientation = .portrait
+    photoOutput.connections.first?.videoOrientation = .portrait
+        
+    photoOutput.isHighResolutionCaptureEnabled = true
+    
+	captureSession.commitConfiguration()
+}
+```
+
+-----
+
+### E. 디바이스 별 특성 고려
+
+아이폰 및 아이패드의 경우, 라인업 모델 티어와 발매 시점에 따라 렌즈 구성 및 플래시 유무가 다르다.
+
+아이폰의 경우, 같은 듀얼/트리플 렌즈라고 해도 렌즈 배율도 달라진다.
+모델 구분은 다음과 같다. (iPhone 15까지 라인업 고려)
+
+|모델|초광각|광각|망원|
+|------|---|---|---|
+|SE, 6S, 6S Plus, XR, SE2, SE3||X1||
+|7 Plus, 8 Plus, X, XS, XS Max||X1|X2|
+|11, 12 mini, 12, 13 mini, 13, 14, 14 Plus, 15, 15 Plus|X0.5|X1||
+|11 Pro, 11 Pro Max, 12 Pro|X0.5|X1|X2|
+|12 Pro Max|X0.5|X1|X2.5|
+|13 Pro, 13 Pro Max, 14 Pro, 14 Pro Max, 15 Pro|X0.5|X1|X3|
+|15 Pro Max|X0.5|X1|X5|
+
+아이패드의 경우, 아이패드 프로 라인업을 제외하면 모든 아이패드는 플래시가 존재하지 않는다. 플래시 버튼 기능을 활용하면 런타임 에러가 난다.
+업데이트 심사 도중 테스트 기기인 아이패드에서 플래시가 없는 상황에서 플래시 버튼을 눌러 크래시가 난 경우로 심사 거부를 당한 경험도 있다.
+
+이를 해결하기 위해서 각 모델의 이름을 String으로 받아 각 특징별 UI를 다르게 적용한다.
+
+```swift
+private func getModelName() -> String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let model = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        
+        //dual, triple 각 모델 구분 목적
+        //매년 새모델 업데이트 필요
+        switch model {
+        case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
+        case "iPhone10,2", "iPhone10,5":                return "iPhone 8 Plus"
+        case "iPhone10,3", "iPhone10,6":                return "iPhone X"
+        case "iPhone11,2":                              return "iPhone XS"
+        case "iPhone11,4", "iPhone11,6":                return "iPhone XS Max"
+        case "iPhone12,1":                              return "iPhone 11"
+        case "iPhone12,3":                              return "iPhone 11 Pro"
+        case "iPhone12,5":                              return "iPhone 11 Pro Max"
+        case "iPhone13,1":                              return "iPhone 12 Mini"
+        case "iPhone13,2":                              return "iPhone 12"
+        case "iPhone13,3":                              return "iPhone 12 Pro"
+        case "iPhone13,4":                              return "iPhone 12 Pro Max"
+        case "iPhone14,4":                              return "iPhone 13 mini"
+        case "iPhone14,5":                              return "iPhone 13"
+        case "iPhone14,2":                              return "iPhone 13 Pro"
+        case "iPhone14,3":                              return "iPhone 13 Pro Max"
+        case "iPhone14,7":                              return "iPhone 14"
+        case "iPhone14,8":                              return "iPhone 14 Plus"
+        case "iPhone15,2":                              return "iPhone 14 Pro"
+        case "iPhone15,3":                              return "iPhone 14 Pro Max"
+        case "iPhone15,4":                              return "iPhone 15"
+        case "iPhone15,5":                              return "iPhone 15 Plus"
+        case "iPhone16,1":                              return "iPhone 15 Pro"
+        case "iPhone16,2":                              return "iPhone 15 Pro Max"
+            
+        //iPad for non-flash model
+        case "iPad6,11", "iPad6,12":                    return "iPad 5"
+        case "iPad7,5", "iPad7,6":                      return "iPad 6"
+        case "iPad7,11", "iPad7,12":                    return "iPad 7"
+        case "iPad11,6", "iPad11,7":                    return "iPad 8"
+        case "iPad12,1", "iPad12,2":                    return "iPad 9"
+        case "iPad13,18", "iPad13,19":                  return "iPad 10"
+        case "iPad5,3", "iPad5,4":                      return "iPad Air 2"
+        case "iPad11,3", "iPad11,4":                    return "iPad Air 3"
+        case "iPad13,1", "iPad13,2":                    return "iPad Air 4"
+        case "iPad13,16", "iPad13,17":                  return "iPad Air 5"
+        case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
+        case "iPad11,1", "iPad11,2":                    return "iPad Mini 5"
+        case "iPad14,1", "iPad14,2":                    return "iPad Mini 6"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9-inch"
+        default:                                        return model
+        } 
+    }
+```
+
+프로 모델의 트리플 카메라 경우, 망원 배율을 각 모델에 맞게 다르게 설정한다.
+
+```swift
+if backCamera == AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
+	backCamera = AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
+	isZoomIn = true
+            
+	DispatchQueue.main.async {
+		switch self.modelName {
+		case "iPhone 12 Pro Max":
+            self.cameraLensButton.setImage(UIImage(named: "telephotoAngle2.5"), for: .normal)
+		case "iPhone 11 Pro", "iPhone 11 Pro Max", "iPhone 12 Pro":
+			self.cameraLensButton.setImage(UIImage(named: "telephotoAngle2"), for: .normal)
+		case "iPhone 15 Pro Max":
+			self.cameraLensButton.setImage(UIImage(named: "telephotoAngle5"), for: .normal)
+		default:
+			self.cameraLensButton.setImage(UIImage(named: "telephotoAngle3"), for: .normal)
+		}
+	}
+}
+```
+
+플래시 없는 아이패드 모델의 경우, 플래시 버튼을 숨기도록 한다.
+
+```swift
+let nonFlashIpadModels = ["iPad 5", "iPad 6", "iPad 7", "iPad 8", "iPad 9", "iPad 10", "iPad Air 2", "iPad Air 3", "iPad Air 4", "iPad Air 5", "iPad Mini 4", "iPad Mini 5", "iPad Mini 6", "iPad Pro 12.9-inch"]
+
+if nonFlashIpadModels.contains(modelName!) {
+	flashButton.setValue(true, forKey: "hidden")
+} else {
+	flashButton.setImage(UIImage(named: "flashOff"), for: .normal)
+    flashButton.contentMode = .scaleAspectFill
+}
+```
 
 ------
 
 # 회고
 
-- 필터 적용해 Data 저장 시, 아쉬운 점은 이렇게하면 원본 프레임에 담긴 metadata를 날리게 된다는 것이었다.
-원본 SampleBuffer에서 Metadata까지 얻어와서 같이 저장하도록 설정 필요
+- 필터 적용해서 Data 저장 시, 아쉬운 점은 원본 프레임에 담긴 metadata를 날리게 된다는 것이었다. `CMSampleBuffer`에서 metadata까지 얻어와서 같이 저장하도록 설정하는 작업이 필요했지만 당시에는 여기까지 구현할 여력이 없었던 것으로 보인다. 
 
-- 단순 갤러리에만 저장, 앨범으로 같이 저장하기 (PHCollectionListChangeRequest 활용)
+- photoOutput에서 저장 시, 갤러리에만 저장하고 있지만 보통 필터나 카메라 앱 서비스들은 해당 앱으로 찍은 사진 디렉토리를 설정해준다. 갤러리에서 사진 찾기가 어렵다는 피드백을 받아서 `PHCollectionListChangeRequest`를 활용해서 디렉토리 설정과 더불어 같이 저장을 해야겠다는 필요성을 느끼고 있다.
 
+아쉬웠던 점들은 차후 업데이트로 지원해서 해결해나갈 예정이다.
