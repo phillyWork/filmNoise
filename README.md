@@ -65,7 +65,7 @@ var ciContext: CIContext!
 var currentCIImage: CIImage?
 
 func setUpMetal() {
-		//fetch the default gpu of the device (only one on iOS devices)
+    //fetch the default gpu of the device (only one on iOS devices)
     metalDevice = MTLCreateSystemDefaultDevice()
         
     //setup MTKView's MTLDevice
@@ -78,7 +78,7 @@ func setUpMetal() {
     //command queue to send down instructions to the GPU
     metalCommandQueue = metalDevice.makeCommandQueue()
         
-		//send commands to GPU
+	//send commands to GPU
     //MTKViewDelegate for responding view's drawing events
     mtkView.delegate = self
 
@@ -87,7 +87,7 @@ func setUpMetal() {
 }
 
 func setUpCoreImage() {
-		//initialize CIContext instance using Metal device
+	//initialize CIContext instance using Metal device
     ciContext = CIContext(mtlDevice: metalDevice)
 }
 ```
@@ -97,66 +97,66 @@ func setUpCoreImage() {
 var currentCIImage: CIImage?
 
 extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-		func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {		
+	func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {		
 
-				//get CVImageBuffer out of the sample buffer
-		    guard let cvBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-				    debugPrint("unable to get image from sampleBuffer")
-			      return
-		    }
-		
-				//get CIImage out of the CVImageBuffer
-		    let ciImage = CIImage(cvImageBuffer: cvBuffer)
-
-				//save it in variable to draw in mtkView
-		    self.currentCIImage = ciImage
-
-				//draw on MTKView
-			  mtkView.draw()
+		//get CVImageBuffer out of the sample buffer
+		guard let cvBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+			debugPrint("unable to get image from sampleBuffer")
+			return
 		}
+		
+		//get CIImage out of the CVImageBuffer
+		let ciImage = CIImage(cvImageBuffer: cvBuffer)
+
+		//save it in variable to draw in mtkView
+		self.currentCIImage = ciImage
+
+		//draw on MTKView
+		mtkView.draw()
+	}
 }
 ```
 
 - _MTKViewDelegate의 draw 메서드 수행_
 ```swift
 extension ViewController: MTKViewDelegate {
-  //render on screen
-  func draw(in view: MTKView) {
-    //store a reference to each frame
-    guard let commandBuffer = metalCommandQueue.makeCommandBuffer() else { return }
+	//render on screen
+	func draw(in view: MTKView) {
+    	//store a reference to each frame
+    	guard let commandBuffer = metalCommandQueue.makeCommandBuffer() else { return }
         
-    //ciImage with filter data to work with
-    guard let ciImage = currentCIImage else { return }
+	    //ciImage with filter data to work with
+    	guard let ciImage = currentCIImage else { return }
 
-    //make sure currentDrawable object is available
-    //should not be in use by previous draw cycle
-    guard let currentDrawable = view.currentDrawable else { return }
+		//make sure currentDrawable object is available
+    	//should not be in use by previous draw cycle
+    	guard let currentDrawable = view.currentDrawable else { return }
 
-    let widthOfDrawable = view.drawableSize.width
-    let heightOfDrawable = view.drawableSize.height
+    	let widthOfDrawable = view.drawableSize.width
+    	let heightOfDrawable = view.drawableSize.height
         
-    //frame is centered on screen
-    let widthOfciImage = ciImage.extent.width
-    let xOffsetFromBottom = (widthOfDrawable - widthOfciImage)/2
+    	//frame is centered on screen
+    	let widthOfciImage = ciImage.extent.width
+    	let xOffsetFromBottom = (widthOfDrawable - widthOfciImage)/2
         
-    let heightOfciImage = ciImage.extent.height
-    let yOffsetFromBottom = (heightOfDrawable - heightOfciImage)/2
+    	let heightOfciImage = ciImage.extent.height
+    	let yOffsetFromBottom = (heightOfDrawable - heightOfciImage)/2
             
-    //render a CIImage into our metal texture
+    	//render a CIImage into our metal texture
         
-    //image: CIImage for each frame
-    //texture: rendering it to the screen through mtkView
-    //commandBuffer: instructions sent through commandQueue to GPU
-    //bounds: GCRect to draw the image on the texture
-    //colorSpace: tells CIContext how to interpret color info from CIImage
-    self.ciContext.render(ciImage, to: currentDrawable.texture, commandBuffer: commandBuffer, bounds: CGRect(origin: CGPoint(x: -xOffsetFromBottom, y: -yOffsetFromBottom), size: view.drawableSize), colorSpace: CGColorSpaceCreateDeviceRGB())
+    	//image: CIImage for each frame
+    	//texture: rendering it to the screen through mtkView
+    	//commandBuffer: instructions sent through commandQueue to GPU
+    	//bounds: GCRect to draw the image on the texture
+    	//colorSpace: tells CIContext how to interpret color info from CIImage
+    	self.ciContext.render(ciImage, to: currentDrawable.texture, commandBuffer: commandBuffer, bounds: CGRect(origin: CGPoint(x: -xOffsetFromBottom, y: -yOffsetFromBottom), size: view.drawableSize), colorSpace: CGColorSpaceCreateDeviceRGB())
         
-    //register to draw the instructions in the command buffer once it executes
-    commandBuffer.present(currentDrawable)
+    	//register to draw the instructions in the command buffer once it executes
+    	commandBuffer.present(currentDrawable)
         
-    //commit the command to the queue ~ execute
-    commandBuffer.commit()
-  }
+    	//commit the command to the queue ~ execute
+    	commandBuffer.commit()
+	}
 }
 ```
 
