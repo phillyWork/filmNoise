@@ -37,6 +37,9 @@
 - `AnalyticsWithoutAdidSupport`와 `Crashlytics`를 활용, UUID 정보 없이도 UI component 활용 통계 및 크래시 정보 수집
 - `ATTrackingManager` 활용하여 광고 권한 얻고 `Admob` 활용해 배너 광고 게재
 
+### 전체적인 촬영 Flow
+![totalFlow](./readMeImage/totalFlow.jpg)
+
 ------
 
 # Trouble Shooting
@@ -165,13 +168,19 @@ extension ViewController: MTKViewDelegate {
 ### B. Custom CIFilter 제작
 
 기본 제공되는 CIFilter만 활용하기엔 수치 조정을 직접 할 수 없어서 원하는 색감 표현에 한계가 존재했다. Metal로 직접 CIFilter를 만들어 활용했다.
-WWDC의 Session을 보면서 전체 흐름을 익히고 난 뒤, 이미지 프로세싱을 위한 도메인 지식을 활용해 수치를 조정했다.
+
+#### 1. WWDC의 Session을 보면서 전체 흐름을 익힌다.
 
 [WWDC14: Working with Metal: Overview](https://developer.apple.com/videos/play/wwdc2014/603/)
+
 [WWDC20: Build Metal-based Core Image kernels with Xcode](https://developer.apple.com/videos/play/wwdc2020/10021/)
+
 [WWDC21: Explore Core Image kernel improvements](https://developer.apple.com/videos/play/wwdc2021/10159/)
 
+WWDC의 설명으로는 Metal로 커스텀 CIFilter
 
+
+#### 2. 이미지 프로세싱을 위한 도메인 지식을 활용해 Metal 파일에서 수치를 조정했다.
 
 
 
