@@ -169,7 +169,9 @@ extension ViewController: MTKViewDelegate {
 
 기본 제공되는 CIFilter만 활용하기엔 수치 조정을 직접 할 수 없어서 원하는 색감 표현에 한계가 존재했다. Metal로 직접 CIFilter를 만들어 활용했다.
 
-#### 1. WWDC의 Session을 보면서 전체 흐름을 익힌다.
+#### 1. WWDC의 Session을 참고하며 Xcode Build Settings에서 Metal Linker - Build Options에 `-fcikernel`을 추가해서 CIKernel 인식을 할 수 있도록 해준다.
+
+![metalLinkerSetting](./readMeImage/metalLinkerSetting.png)
 
 [WWDC14: Working with Metal: Overview](https://developer.apple.com/videos/play/wwdc2014/603/)
 
@@ -177,11 +179,158 @@ extension ViewController: MTKViewDelegate {
 
 [WWDC21: Explore Core Image kernel improvements](https://developer.apple.com/videos/play/wwdc2021/10159/)
 
-Xcode Build Settings에서 Metal Linker - Build Options에 `-fcikernel`을 추가해서 CIKernel 인식을 할 수 있도록 해준다.
-
-
-
 #### 2. 이미지 프로세싱을 위한 도메인 지식을 활용해 Metal 파일에서 수치를 조정했다.
+
+예를 들어 대비(Contrast) 보정 알고리즘은 다음과 같다.
+
+> Contrast = Luminance difference / Average Luminance
+
+각 픽셀의 RGB값은 8bit의 0~255 사이의 값을 가지므로 average luminance는 중간값인 128이다.
+중간값과 차가 많이 날 수록 그 차이를 줄여줄여면 중간값으로 나눠 전체 밝기 차이를 줄여준다.
+중간값에서 각 픽셀의 값 사이의 차이를 Luminance difference로 설정하면 다음과 같이 작성할 수 있다. 
+(F: 보정계수)
+
+$$RGB' = F(RGB-128) + 128$$
+
+Metal에서 sample 영역의 RGB 값은 0부터 1의 부동소수점이므로, 대비 보정을 위한 코드를 작성하면 다음과 같다.
+
+```metal
+//contrast: 원하는 대비 수준, 보정 계수
+sample.rgb = (sample.rgb - 0.5) * contrast + 0.5;
+```
+
+이를 토대로 작성한 필터 코드들은 다음과 같다.
+
+##### minimal life: 흑백 필터로 정석 grayscale 수치를 활용한다.
+
+```metal
+#include <metal_stdlib>
+using namespace metal;
+
+#include <CoreImage/CoreImage.h>
+
+extern "C" {
+    namespace coreimage {
+        float4 AgfaAPX400 (sample_t s,
+                           float gammaCorrection,
+                           float exposure,
+                           float contrast)
+        {
+
+            // exposure adjustment
+            if (s.r + exposure > 1) {
+                s.r = 1;
+            } else if (s.r + exposure < 0) {
+                s.r = 0;
+            } else {
+                s.r += exposure;
+            }
+            
+            if (s.b + exposure > 1) {
+                s.b = 1;
+            } else if (s.b + exposure < 0) {
+                s.b = 0;
+            } else {
+                s.b += exposure;
+            }
+            
+            if (s.g + exposure > 1) {
+                s.g = 1;
+            } else if (s.g + exposure < 0) {
+                s.g = 0;
+            } else {
+                s.g += exposure;
+            }
+            
+            //convert color to grayscale
+            float gray = dot(s.rgb, float3(0.299, 0.587, 0.114));
+            s.rgb = float3(gray);
+
+            //adjust contrast
+            s.rgb = (s.rgb - 0.5) * contrast + 0.5;
+
+            //gamma correction
+            s.rgb = pow(s.rgb, gammaCorrection);
+            
+            return s;
+        }
+    }
+}
+```
+
+##### tumble down: 암부 부분에서 보라 계열 색이 올라오는 효과를 지닌다.
+
+```metal
+#include <metal_stdlib>
+using namespace metal;
+
+#include <CoreImage/CoreImage.h>
+
+extern "C" {
+    namespace coreimage {
+        float4 Evangelion (sample_t s,
+                           float gammaCorrection,
+                           float exposure,
+                           float contrast)
+        {
+            
+            //exposure
+            if (s.r + exposure > 1) {
+                s.r = 1;
+            } else if (s.r + exposure < 0) {
+                s.r = 0;
+            } else {
+                s.r += exposure;
+            }
+            
+            if (s.b + exposure > 1) {
+                s.b = 1;
+            } else if (s.b + exposure < 0) {
+                s.b = 0;
+            } else {
+                s.b += exposure;
+            }
+            
+            if (s.g + exposure > 1) {
+                s.g = 1;
+            } else if (s.g + exposure < 0) {
+                s.g = 0;
+            } else {
+                s.g += exposure;
+            }
+            
+            //contrast
+            s.rgb = (s.rgb - 0.5) * contrast + 0.5;
+            
+            //gamma correction
+            s.rgb = pow(s.rgb, gammaCorrection);
+         
+            //check luminance of color
+            //float3(0.2126, 0.7152, 0.0722): y(luminance) of monitor
+            float luma = dot(s.rgb, float3(0.2126, 0.7152, 0.0722));
+            if (luma < 0.3) {
+                s.rgb += float3(0.0077, 0.00268, 0.03215);
+            }
+        
+            return s;
+        }
+    }
+}
+```
+
+dot 함수는 벡터값 처리 함수로 행렬의 각 element를 서로 곱한 값들의 합을 결과물을 얻는다.
+
+> A = [a1, a2, a3]
+> B = [b1, b2, b3]
+>dot(A,B) = (a1*b1) + (a2*b2) + (a3*b3)
+
+각 픽셀은 R, G, B값이 존재하므로 각 픽셀에 grayscale 적용값을 설정해 색상 정보를 죽이고 밝기만을 다루는 효과를 가진다.
+
+
+#### 3. swift 파일로 metal 파일을 등록해서 CIImage를 반환값으로 받는다.
+
+
+
 
 
 
