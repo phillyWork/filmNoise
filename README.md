@@ -180,12 +180,6 @@ extension ViewController: MTKViewDelegate {
 
 ![metalLinkerSetting](./readMeImage/metalLinkerSetting.png)
 
-[WWDC14: Working with Metal: Overview](https://developer.apple.com/videos/play/wwdc2014/603/)
-
-[WWDC20: Build Metal-based Core Image kernels with Xcode](https://developer.apple.com/videos/play/wwdc2020/10021/)
-
-[WWDC21: Explore Core Image kernel improvements](https://developer.apple.com/videos/play/wwdc2021/10159/)
-
 #### 2. 이미지 프로세싱을 위한 도메인 지식을 활용해 Metal 파일에서 수치를 조정했다.
 
 예를 들어 대비(Contrast) 보정 알고리즘은 다음과 같다.
@@ -329,7 +323,7 @@ dot 함수는 벡터값 처리 함수로 행렬의 각 element를 서로 곱한 
 
 > A = [a1, a2, a3], B = [b1, b2, b3]
 
-> dot(A,B) = (a1*b1) + (a2*b2) + (a3*b3)
+> dot(A, B) = (a1 * b1) + (a2 * b2) + (a3 * b3)
 
 각 픽셀은 R, G, B값이 존재하므로 각 픽셀에 grayscale 적용값을 설정해 색상 정보를 죽이고 밝기만을 다루는 효과를 가진다.
 
@@ -542,19 +536,19 @@ func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPat
 
 ------
 
-### C. 필터 데이터 적용된 데이터로 저장하기
+### C. 필터 데이터 적용된 이미지로 저장하기
 
 1. `AVCapturePhotoOutput`을 활용, `captureOutput` 메서드에서의 한 프레임을 저장 시, `photoOutput` 메서드는 원본 프레임의 데이터만 매개변수로 받고 있다.
 
 ```swift
 extension CameraViewController: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+	func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
 		PHPhotoLibrary.shared().performChanges({
-  			// Add the captured photo's file data as the main resource for the Photos asset.
-            let creationRequest = PHAssetCreationRequest.forAsset()
+			// Add the captured photo's file data as the main resource for the Photos asset.
+			let creationRequest = PHAssetCreationRequest.forAsset()
 			creationRequest.addResource(with: .photo, data: photo.fileDataRepresentation()!, options: nil)
-		 })
-   }
+		})
+	}
 }
 ```
 
@@ -590,46 +584,45 @@ _전면/후면 카메라 전환_
 
 ```swift
 @IBAction func switchCameraButtonTapped(_ sender: UIButton) {
-		//reconfigure input
-        captureSession.beginConfiguration()
+	//reconfigure input
+	captureSession.beginConfiguration()
         
-		//후면카메라에서 누른 경우: 전면카메라로 전환하기
-        if cameraPosition != .front {
-            captureSession.removeInput(backInput)
-            captureSession.addInput(frontInput)
+	//후면카메라에서 누른 경우: 전면카메라로 전환하기
+	if cameraPosition != .front {
+		captureSession.removeInput(backInput)
+		captureSession.addInput(frontInput)
 
-			//mirror video if front camera
-			videoOutput.connections.first?.isVideoMirrored = true
-			photoOutput.connections.first?.isVideoMirrored = true
+		//mirror video if front camera
+		videoOutput.connections.first?.isVideoMirrored = true
+		photoOutput.connections.first?.isVideoMirrored = true
             
-			cameraPosition = .front
+		cameraPosition = .front
 
-			//전면카메라 전환 시 후면 렌즈 선택 숨기기
-			cameraLensButton.setValue(true, forKey: "hidden")
-		} else {
-			//전면카메라에서 누른 경우: 후면카메라로 전환하기
-			captureSession.removeInput(frontInput)
-            captureSession.addInput(backInput)
+		//전면카메라 전환 시 후면 렌즈 선택 숨기기
+		cameraLensButton.setValue(true, forKey: "hidden")
+	} else {
+		//전면카메라에서 누른 경우: 후면카메라로 전환하기
+		captureSession.removeInput(frontInput)
+	    captureSession.addInput(backInput)
             
-            videoOutput.connections.first?.isVideoMirrored = false
-            photoOutput.connections.first?.isVideoMirrored = false
+        videoOutput.connections.first?.isVideoMirrored = false
+		photoOutput.connections.first?.isVideoMirrored = false
             
-            cameraPosition = .back
+		cameraPosition = .back
             
-            //후면카메라 전환 시 렌즈 선택 다시 보이기
-            cameraLensButton.setValue(false, forKey: "hidden")
-		}
+		//후면카메라 전환 시 렌즈 선택 다시 보이기
+		cameraLensButton.setValue(false, forKey: "hidden")
+	}
 
-		//deal with the connection again for portrait mode
-        videoOutput.connections.first?.videoOrientation = .portrait
-        photoOutput.connections.first?.videoOrientation = .portrait
+	//deal with the connection again for portrait mode
+	videoOutput.connections.first?.videoOrientation = .portrait
+	photoOutput.connections.first?.videoOrientation = .portrait
         
-        photoOutput.isHighResolutionCaptureEnabled = true
+	photoOutput.isHighResolutionCaptureEnabled = true
 
-		//commit config
-        captureSession.commitConfiguration()
+	//commit config
+	captureSession.commitConfiguration()
 }
-
 ```
 
 _듀얼/트리플 카메라 전환_
