@@ -96,6 +96,10 @@ func setUpCoreImage() {
 ```
 - _AVCaptureVideoDataOutputSampleBufferDelegate의 captureOutput 메서드에서 원본 image buffer에서 CIImage 추출, MTKViewDelegate의 draw 메서드 호출_
 ```swift
+//filter 적용 CIImage 반환할 함수 타입 변수
+//시작 시, original 적용
+var selectedFilter: (CIImage) -> CIImage? = FilterFunctions.original(ciImage:)
+
 //유저가 특정 필터를 선택할 시, 해당 필터를 담고 있을 변수
 var currentCIImage: CIImage?
 
@@ -111,8 +115,11 @@ extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
 		//get CIImage out of the CVImageBuffer
 		let ciImage = CIImage(cvImageBuffer: cvBuffer)
 
+		//필터 적용
+		guard let resultImage = selectedFilter(ciImage) else { return }
+
 		//save it in variable to draw in mtkView
-		self.currentCIImage = ciImage
+		self.currentCIImage = resultImage
 
 		//draw on MTKView
 		mtkView.draw()
@@ -320,24 +327,257 @@ extern "C" {
 
 dot 함수는 벡터값 처리 함수로 행렬의 각 element를 서로 곱한 값들의 합을 결과물을 얻는다.
 
-> A = [a1, a2, a3]
-> B = [b1, b2, b3]
->dot(A,B) = (a1*b1) + (a2*b2) + (a3*b3)
+> A = [a1, a2, a3], B = [b1, b2, b3]
+
+> dot(A,B) = (a1*b1) + (a2*b2) + (a3*b3)
 
 각 픽셀은 R, G, B값이 존재하므로 각 픽셀에 grayscale 적용값을 설정해 색상 정보를 죽이고 밝기만을 다루는 효과를 가진다.
 
 
 #### 3. swift 파일로 metal 파일을 등록해서 CIImage를 반환값으로 받는다.
 
+```swift
+class AgfaAPX400Filter: CIFilter {
+    
+    var gammaCorrection: Float = 2.0
+    var exposure: Float = 0.03
+    var contrast: Float = 0.75
+    
+    private let kernel: CIKernel
+    
+    override init() {
+        //kernel setting: metallib에 등록된 kernel 불러오며 커스텀 CIFilter 초기화
+        let url = Bundle.main.url(forResource: "default", withExtension: "metallib")!
+        let data = try! Data(contentsOf: url)
+        self.kernel = try! CIColorKernel(functionName: "AgfaAPX400", fromMetalLibraryData: data)
+        super.init()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
+	//CIImage 산출
+    func outputImage(input: CIImage) -> CIImage? {
+        //extent: area for applying kernel
+        //roi: region of interest for sampling (specify which region of input should be processed)
+        return self.kernel.apply(extent: input.extent, roiCallback:  { _, r in r }, arguments: [input, gammaCorrection, exposure, contrast])
+    }
+}
+```
 
+#### 4. 커스텀 필터 적용한 CIImage에 기존 CIFilter chaining으로 조합하여 원하는 최종 CIImage 반환
 
+```swift
+struct FilterFunctions {
+	private struct VectorSetting {
+        let grayscaleVector = CIVector(x: 0.2126, y: 0.7152, z: 0.0722, w: 0)
+        let AlphaVector = CIVector(x: 0, y: 0, z: 0, w: 1)
+        let zeroVector = CIVector(x: 0, y: 0, z: 0, w: 0)
+    }
+    
+    private struct NoiseSetting {
+        // Adjust noise image using CIColorControls
+        let noiseBrightness: Float
+        let noiseContrast: Float
+        let noiseSaturation: Float
+        
+        init(brightness noiseBrightness: Float, contrast noiseContrast: Float, saturation noiseSaturation: Float) {
+            self.noiseBrightness = noiseBrightness
+            self.noiseContrast = noiseContrast
+            self.noiseSaturation = noiseSaturation
+        }
+    }
 
+	//필터 적용하지 않은 default CIImage
+	static func original(ciImage image: CIImage) -> CIImage? {
+        return image
+    }
 
+	//minimal life
+    static func agfaAPX400(ciImage image: CIImage) -> CIImage? {
+        let agfaFilter = AgfaAPX400Filter()
+        let agfaResult = agfaFilter.outputImage(input: image)
+        
+        let vectorSetting = VectorSetting()
+        //create B&W image of original for masking's background
+        guard
+            let grayscaleFilter = CIFilter(name: "CIColorMatrix", parameters:
+                                           [
+                                            kCIInputImageKey: image,
+                                            "inputRVector": vectorSetting.grayscaleVector,
+                                            "inputGVector": vectorSetting.grayscaleVector,
+                                            "inputBVector": vectorSetting.grayscaleVector,
+                                            "inputAVector": vectorSetting.AlphaVector,
+                                            "inputBiasVector": vectorSetting.zeroVector
+                                           ]),
+            let bwImage = grayscaleFilter.outputImage
+        else {
+            print("Can't produce grayscaleFilter and bwImage")
+            return nil
+        }
+        
+        //create randomly varying speckle
+        guard
+            let colorNoise = CIFilter(name: "CIRandomGenerator"),
+            let noiseImage = colorNoise.outputImage
+        else {
+            print("Can't produce grainImage")
+            return nil
+        }
+        
+        let noiseSettingForAgfa = NoiseSetting(brightness: 0.6, contrast: 0.9, saturation: 1.8)
+        guard
+            let noiseControlsFilter = CIFilter(name: "CIColorControls", parameters:
+                                                [
+                                                    kCIInputImageKey: noiseImage,
+                                                    kCIInputBrightnessKey: noiseSettingForAgfa.noiseBrightness,
+                                                    kCIInputContrastKey: noiseSettingForAgfa.noiseContrast,
+                                                    kCIInputSaturationKey: noiseSettingForAgfa.noiseSaturation
+                                                ]),
+            let adjustedNoiseImage = noiseControlsFilter.outputImage
+        else {
+            print("Can't produce noiseControlsFilter and adjustedNoiseImage")
+            return nil
+        }
+        
+        //blend agfaResult, bw original image with mask of noiseFilter
+        guard
+            let blendFilter = CIFilter(name: "CIBlendWithMask", parameters:
+                                        [
+                                            kCIInputImageKey: agfaResult!,
+                                            kCIInputBackgroundImageKey: bwImage,
+                                            kCIInputMaskImageKey: adjustedNoiseImage
+                                        ]),
+            let blendImage = blendFilter.outputImage
+        else {
+            print("Can't produce blendFilter and blendImage")
+            return nil
+        }
+
+		//mask 적용하면서 노이즈로 테두리 설정되는 것 방지
+        return blendImage.cropped(to: image.extent)
+    }
+
+	//tumble down
+	static func evangelion(ciImage image: CIImage) -> CIImage? {
+        let evaFilter = EvangelionFilter()
+        let evaResult = evaFilter.outputImage(input: image)
+        
+        let vectorSetting = VectorSetting()
+        guard
+            let grayscaleFilter = CIFilter(name: "CIColorMatrix", parameters:
+                                           [
+                                            kCIInputImageKey: image,
+                                            "inputRVector": vectorSetting.grayscaleVector,
+                                            "inputGVector": vectorSetting.grayscaleVector,
+                                            "inputBVector": vectorSetting.grayscaleVector,
+                                            "inputAVector": vectorSetting.AlphaVector,
+                                            "inputBiasVector": vectorSetting.zeroVector
+                                           ]),
+            let bwImage = grayscaleFilter.outputImage
+        else {
+            print("Can't produce grayscaleFilter and bwImage")
+            return nil
+        }
+        
+        guard
+            let colorNoise = CIFilter(name: "CIRandomGenerator"),
+            let noiseImage = colorNoise.outputImage
+        else {
+            print("Can't produce grainImage")
+            return nil
+        }
+        
+        let noiseSettingForEva = NoiseSetting(brightness: 0.65, contrast: 1.13, saturation: 1.27)
+        guard
+            let noiseControlsFilter = CIFilter(name: "CIColorControls", parameters:
+                                                [
+                                                    kCIInputImageKey: noiseImage,
+                                                    kCIInputBrightnessKey: noiseSettingForEva.noiseBrightness,
+                                                    kCIInputContrastKey: noiseSettingForEva.noiseContrast,
+                                                    kCIInputSaturationKey: noiseSettingForEva.noiseSaturation
+                                                ]),
+            let adjustedNoiseImage = noiseControlsFilter.outputImage
+        else {
+            print("Can't produce noiseControlsFilter and adjustedNoiseImage")
+            return nil
+        }
+        
+        guard
+            let blendFilter = CIFilter(name: "CIBlendWithMask", parameters:
+                                        [
+                                            kCIInputImageKey: evaResult!,
+                                            kCIInputBackgroundImageKey: bwImage,
+                                            kCIInputMaskImageKey: adjustedNoiseImage
+                                        ]),
+            let blendImage = blendFilter.outputImage
+        else {
+            print("Can't produce blendFilter and blendImage")
+            return nil
+        }
+        
+        return blendImage.cropped(to: image.extent)
+    }
+}
+```
+
+#### 5. 유저가 해당 필터 선택 시, 함수 타입의 변수에 할당, AVCaptureVideoDataOutputSampleBufferDelegate의 captureOutput에 활용
+
+```swift
+func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let nameLabel = filterManager.getWholeFilterData()[indexPath.row].nameLabel
+        
+        switch nameLabel {
+        case "minimal life":
+            selectedFilter = FilterFunctions.agfaAPX400(ciImage:)
+        case "tumble down":
+            selectedFilter = FilterFunctions.evangelion(ciImage:)
+        default:
+            selectedFilter = FilterFunctions.original(ciImage:)
+        }
+        self.selectedFilterLabel = nameLabel
+}
+```
 
 ------
 
-### C. 
+### C. 필터 데이터 적용된 데이터로 저장하기
+
+1. `AVCapturePhotoOutput`을 활용, `captureOutput` 메서드에서의 한 프레임을 저장 시, `photoOutput` 메서드는 원본 프레임의 데이터만 매개변수로 받고 있다.
+
+```swift
+extension CameraViewController: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+		PHPhotoLibrary.shared().performChanges({
+  			// Add the captured photo's file data as the main resource for the Photos asset.
+            let creationRequest = PHAssetCreationRequest.forAsset()
+			creationRequest.addResource(with: .photo, data: photo.fileDataRepresentation()!, options: nil)
+		 })
+   }
+}
+```
+
+2. 필터 적용된 CIImage를 `UIImageSavedToPhotosAlbum` 메서드로 저장 시, 이미지 사이즈가 300kb 미만의 저화질 사진이 되는 문제가 있었다. (photoOutput: 10~20mb 크기)
+
+따라서 필터 데이터 CIImage를 Data type으로 변환하여 photoOutput에서 해당 data를 저장하도록 해결을 했다.
+
+```swift
+extension ViewController: AVCapturePhotoCaptureDelegate {
+	func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+		//get CIImage from captureOutput, which has filter data
+		guard let ciImage = currentCIImage else { return }
+    
+        let filteredImage = UIImage(ciImage: ciImage)
+		//크기 조절 및 data로 변환
+		let data = filteredImage.jpegData(compressionQuality: 0.98)
+
+		PHPhotoLibrary.shared().performChanges({
+			PHAssetCreationRequest.forAsset().addResource(with: .photo, data: self.data!, options: nil)
+		})
+	}
+}
+```
 
 ------
 
@@ -348,6 +588,8 @@ dot 함수는 벡터값 처리 함수로 행렬의 각 element를 서로 곱한 
 
 # 회고
 
-- 원본 SampleBuffer에서 Metadata까지 얻어와서 같이 저장하도록 설정 필요
+- 필터 적용해 Data 저장 시, 아쉬운 점은 이렇게하면 원본 프레임에 담긴 metadata를 날리게 된다는 것이었다.
+원본 SampleBuffer에서 Metadata까지 얻어와서 같이 저장하도록 설정 필요
+
 - 단순 갤러리에만 저장, 앨범으로 같이 저장하기 (PHCollectionListChangeRequest 활용)
 
