@@ -10,6 +10,8 @@
 
 [첫 배포 이후 블로그 회고 링크](https://velog.io/@simonyain/series/filmNoise-개발-과정)
 
+[filmNoise instagram](https://www.instagram.com/filmnoise_official/)
+
 # 개발 기간 및 인원
 - 2023.02.05 ~ 2023.03.08
 - 배포 이후 지속적 업데이트 중 (현재 version 2.3.1)
