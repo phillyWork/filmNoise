@@ -918,10 +918,43 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
             }
             
             PHPhotoLibrary.shared().performChanges({
-                // Add the captured photo's file data as the main resource for the Photos asset.
-                let creationRequest = PHAssetCreationRequest.forAsset()
-                creationRequest.addResource(with: .photo, data: self.data!, options: nil)
-                //원본 그대로 저장: .addResource(with: .photo, data: photo.fileDataRepresentation()!, options: nil)
+                var existingAlbum: PHAssetCollection?
+                
+                //check album existance
+                let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+                albums.enumerateObjects { album, index, stop in
+                    if album.localizedTitle == "filmNoise" {
+                        existingAlbum = album as? PHAssetCollection
+                    }
+                }
+                    
+                if let album = existingAlbum {
+                    //album exists
+                    print("Album Exists")
+                    self.savePhotoToAlbum(album: album)
+                } else {
+                    print("No Album")
+                    //create new album
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: "filmNoise")
+                    }, completionHandler: { didSucceed, error in
+                        if didSucceed {
+                            let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+                            albums.enumerateObjects { album, index, stop in
+                                if album.localizedTitle == "filmNoise" {
+                                    existingAlbum = album as? PHAssetCollection
+                                }
+                            }
+                            if let album = existingAlbum {
+                                print("Album created and found")
+                                self.savePhotoToAlbum(album: album)
+                            }
+                        } else {
+                            print("Can't create new album!")
+                            return
+                        }
+                    })
+                }
             }) { (success, error) in
                 if success {
                     //저장 완료 알림 주기
@@ -948,6 +981,18 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         
     }
     
+    func savePhotoToAlbum(album: PHAssetCollection) {
+        PHPhotoLibrary.shared().performChanges {
+            //request to add image into newly created album
+            let assetCreationRequest = PHAssetChangeRequest.creationRequestForAsset(from: UIImage(data: self.data!)!)
+            
+            guard let addAssetRequest = PHAssetCollectionChangeRequest(for: album) else {
+                print("Can't create addAssetRequest")
+                return
+            }
+            addAssetRequest.addAssets([assetCreationRequest.placeholderForCreatedAsset!] as NSArray)
+        }
+    }
 
     //show photo saving permission alert
     private func showPhotoSavePermissionAlert() {
