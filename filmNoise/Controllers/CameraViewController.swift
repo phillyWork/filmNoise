@@ -931,7 +931,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
                 if let album = existingAlbum {
                     //album exists
                     print("Album Exists")
-                    self.savePhotoToAlbum(album: album)
+                    self.savePhotoToAlbum(album: album, original: photo)
                 } else {
                     print("No Album")
                     //create new album
@@ -947,7 +947,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
                             }
                             if let album = existingAlbum {
                                 print("Album created and found")
-                                self.savePhotoToAlbum(album: album)
+                                self.savePhotoToAlbum(album: album, original: photo)
                             }
                         } else {
                             print("Can't create new album!")
@@ -981,16 +981,45 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         
     }
     
-    func savePhotoToAlbum(album: PHAssetCollection) {
-        PHPhotoLibrary.shared().performChanges {
-            //request to add image into newly created album
-            let assetCreationRequest = PHAssetChangeRequest.creationRequestForAsset(from: UIImage(data: self.data!)!)
-            
-            guard let addAssetRequest = PHAssetCollectionChangeRequest(for: album) else {
-                print("Can't create addAssetRequest")
-                return
+    func savePhotoToAlbum(album: PHAssetCollection, original: AVCapturePhoto) {
+        if let imageData = self.data as CFData?,
+           let imageSource = CGImageSourceCreateWithData(imageData, nil),
+           let imageUTType = CGImageSourceGetType(imageSource) {
+           
+            let destinationData = NSMutableData()
+            if let imageDestination = CGImageDestinationCreateWithData(destinationData, imageUTType, 1, nil) {
+                
+                var metadata = original.metadata
+    
+                //portrait mode
+                metadata[kCGImagePropertyOrientation as String] = 1
+
+                CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, metadata as CFDictionary)
+                                
+                if CGImageDestinationFinalize(imageDestination) {
+                    
+                    let metadataEmbedded = Data(destinationData as Data)
+                    let optionsForCreateRequest = PHAssetResourceCreationOptions()
+                    
+                    PHPhotoLibrary.shared().performChanges({
+                        //request to add image into newly created album
+                        let assetCreationRequest = PHAssetCreationRequest.forAsset()
+                        assetCreationRequest.addResource(with: .photo, data: metadataEmbedded, options: optionsForCreateRequest)
+                                            
+                        guard let addAssetRequest = PHAssetCollectionChangeRequest(for: album) else {
+                            print("Can't create addAssetRequest")
+                            return
+                        }
+                        addAssetRequest.addAssets([assetCreationRequest.placeholderForCreatedAsset!] as NSArray)
+                    })
+                } else {
+                    print("Can't finalize image destination")
+                }
+            } else {
+                print("Can't set destination for metadata")
             }
-            addAssetRequest.addAssets([assetCreationRequest.placeholderForCreatedAsset!] as NSArray)
+        } else {
+            print("Not available to set up for metadata")
         }
     }
 
