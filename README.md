@@ -14,7 +14,7 @@
 
 # 개발 기간 및 인원
 - 2023.02.05 ~ 2023.03.08
-- 배포 이후 지속적 업데이트 중 (현재 version 2.3.1)
+- 배포 이후 지속적 업데이트 중
 - 최소 버전: iOS 14.1
 - 1인 개발
 
@@ -22,7 +22,7 @@
 - **UIKit, AVFoundation, MetalKit, Photos, AppTrackingTransparency, SPM**
 - **FirebaseAnalyticsWithoutAdidSupport, FirebaseCrashlytics, GoogleMobileAds, NVActivityIndicatorView**
 - **MVC, Storyboard, Delegate, GCD**
-- **AVCaptureSession & MTKView, custom CIFilter & CIKernel, PHPhotoLibrary**
+- **AVCaptureSession & MTKView, custom CIFilter & CIKernel, PHPhotoLibrary, PHPickerViewController**
 
 ------
 
@@ -38,6 +38,12 @@
 - `PHPhotoLibrary` 활용, 사진 저장 권한 요청 및 갤러리 앨범에 사진 저장
 - `AnalyticsWithoutAdidSupport`와 `Crashlytics`를 활용, UUID 정보 없이도 UI component 활용 통계 및 크래시 정보 수집
 - `ATTrackingManager` 활용하여 광고 권한 얻고 `Admob` 활용해 배너 광고 게재
+
+#### 업데이트 기능 추가
+- `CGImageDestinationCreateWithData` 활용하여 원본 이미지의 metadata를 필터 데이터를 적용한 이미지에 덮어씌우기
+- `PHAssetCollection.fetchAssetCollections` 활용하여 갤러리에 filmNoise 앨범 유무 확인 및 사진 저장 위치 설정
+- `AudioServicesDisposeSystemSoundID` 활용하여 촬영 무음모드 적용
+- `PHPickerViewController` 활용하여 갤러리에서 사진 선택 및 불러오기, 필터 적용 후 저장 가능
 
 ### 전체 촬영 Flow
 ![totalFlow](./readMeImage/totalFlow.jpg)
@@ -774,8 +780,223 @@ if nonFlashIpadModels.contains(modelName!) {
 
 # 회고
 
-- 필터 적용해서 Data 저장 시, 아쉬운 점은 원본 프레임에 담긴 metadata를 날리게 된다는 것이었다. `CMSampleBuffer`에서 metadata까지 얻어와서 같이 저장하도록 설정하는 작업이 필요했지만 당시에는 여기까지 구현할 여력이 없었던 것으로 보인다. 
-
 - photoOutput에서 저장 시, 갤러리에만 저장하고 있지만 보통 필터나 카메라 앱 서비스들은 해당 앱으로 찍은 사진 디렉토리를 설정해준다. 갤러리에서 사진 찾기가 어렵다는 피드백을 받아서 `PHCollectionListChangeRequest`를 활용해서 디렉토리 설정과 더불어 같이 저장을 해야겠다는 필요성을 느끼고 있다.
 
-아쉬웠던 점들은 차후 업데이트로 지원해서 해결해나갈 예정이다.
+> ### 2.4 버전 업데이트 시 구현
+
+```swift
+PHPhotoLibrary.shared().performChanges({
+	var existingAlbum: PHAssetCollection?
+
+	//check album existance
+	let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+	albums.enumerateObjects { album, index, stop in
+		if album.localizedTitle == "filmNoise" {
+			existingAlbum = album as? PHAssetCollection
+		}
+	}
+
+	if let album = existingAlbum {
+		//album exists
+		self.savePhotoToAlbum(album: album, original: photo)
+	} else {
+		//create new album
+		PHPhotoLibrary.shared().performChanges({
+			PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: "filmNoise")
+		}, completionHandler: { didSucceed, error in
+			if didSucceed {
+                            let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+                            albums.enumerateObjects { album, index, stop in
+                                if album.localizedTitle == "filmNoise" {
+                                    existingAlbum = album as? PHAssetCollection
+                                }
+                            }
+                            if let album = existingAlbum {
+                                self.savePhotoToAlbum(album: album, original: photo)
+                            }
+                        } else {
+                            return
+                        }
+		})
+	}
+})
+```
+
+fetchAssetCollections로 PHAssetCollection의 FetchResult를 불러온 뒤, 그 중 title값으로 filmNoise가 존재하면 해당 앨범으로 저장하도록 savePhotoToAlbum 메서드를 호출한다.
+만약 존재하지 않다면 creationRequestForAssetCollection로 filmNoise를 title값으로 갖는 새로운 PHAssetCollection을 생성한 뒤, 해당 앨범에 저장하도록 한다.
+
+- 필터 적용해서 Data 저장 시, 아쉬운 점은 원본 프레임에 담긴 metadata를 날리게 된다는 것이었다. `CMSampleBuffer`에서 metadata까지 얻어와서 같이 저장하도록 설정하는 작업이 필요했지만 당시에는 여기까지 구현할 여력이 없었던 것으로 보인다. 
+
+> ### 2.5 버전 업데이트 시 구현
+
+```swift
+private func savePhotoToAlbum(album: PHAssetCollection, original: AVCapturePhoto) {
+        if let imageData = self.data as CFData?, let imageSource = CGImageSourceCreateWithData(imageData, nil), let imageUTType = CGImageSourceGetType(imageSource) {
+            	let destinationData = NSMutableData()
+		if let imageDestination = CGImageDestinationCreateWithData(destinationData, imageUTType, 1, nil) {
+                
+			var metadata = original.metadata
+    
+	                //portrait mode
+        	        metadata[kCGImagePropertyOrientation as String] = 1
+	
+        	        CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, metadata as CFDictionary)
+                                
+                	if CGImageDestinationFinalize(imageDestination) {
+				let metadataEmbedded = Data(destinationData as Data)
+	               		let optionsForCreateRequest = PHAssetResourceCreationOptions()
+                    
+                    		PHPhotoLibrary.shared().performChanges({
+                        		let assetCreationRequest = PHAssetCreationRequest.forAsset()
+                        		assetCreationRequest.addResource(with: .photo, data: metadataEmbedded, options: optionsForCreateRequest)
+                                            
+                        		guard let addAssetRequest = PHAssetCollectionChangeRequest(for: album) else {
+                            			return
+                        		}
+                        		addAssetRequest.addAssets([assetCreationRequest.placeholderForCreatedAsset!] as NSArray)
+                    		})
+			}
+		}
+	}
+}
+```
+
+당시 아이디어와 다르게, CMSamleBuffer에서 직접 뽑아다 쓸 수 있는 metadata는 기종에 따라 천차만별로 달라졌기에 빈 데이터 형태거나 접근하기 어려운 정보들이었다. 
+이에 생각을 바꿔서 원본의 metadata 그 자체를 새로 필터 데이터를 적용한 이미지에 덮어씌우는 방식으로 다르게 접근했다.
+
+따라서 원본 이미지의 metadata를 CGImageDestinationAddImageFromSource를 활용, 필터 이미지에 덮어 씌우는 작업을 진행했다. 이에 결과물로 기종에 상관없이 카메라 렌즈 및 위치 정보까지는 온전하게 저장하는 것을 확인했다.
+
+- 출시 이후 많은 유저들이 리뷰를 통해 요청한 갤러리에서 사진을 불러와 필터를 적용하고 저장하는 기능을 추가해 줄 것을 요청해왔다.
+
+> ### 3.0 버전 업데이트 시 구현
+
+```swift
+private func presentPicker() {
+        var config = PHPickerConfiguration()
+        
+        if #available(iOS 16.0, *) {
+            config.filter = .any(of: [.images, .livePhotos, .screenshots, .bursts, .depthEffectPhotos, .panoramas])
+        } else if #available(iOS 15.0, *) {
+            config.filter = .any(of: [.images, .livePhotos, .screenshots, .panoramas])
+        } else {
+            config.filter = .any(of: [.images, .livePhotos])
+        }
+        config.selectionLimit = 1
+        
+        let imagePicker = PHPickerViewController(configuration: config)
+        imagePicker.delegate = self
+        
+        self.present(imagePicker, animated: true)
+    }
+```
+
+우선 갤러리에서 사진 선택 및 불러오기 위해 PHPickerViewController를 불러오도록 했다. 
+이 때 iOS 버전별 활용할 수 있는 이미지 파일 형식이 달랐기에 분기별 처리를 활용, PHPickerConfiguration을 구성해서 PHPickerViewController를 생성, present하도록 했다.
+
+```swift
+extension AlbumImageFilterViewController: PHPickerViewControllerDelegate {
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        itemProviders = results.map(\.itemProvider)
+        
+        if !itemProviders.isEmpty {
+            displayImage()
+        }
+    }
+    
+    private func displayImage() {
+        guard let itemProvider = itemProviders.first else { return }
+        
+        if itemProvider.canLoadObject(ofClass: UIImage.self) {
+            itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+                guard let self = self, let image = image as? UIImage else { return }
+                
+                //Check for Multiple Image Selection
+                if originalCIImage != nil {
+                    self.originalCIImage = nil
+                    self.currentImageData = nil
+                }
+                
+                DispatchQueue.main.async {
+                    self.albumImageView.image = image
+                }
+            }
+        }
+    }
+}
+```
+
+PHPickerViewController에서 유저가 사진을 선택했을 때, PHPickerViewController를 dismiss하면서 선택한 이미지를 UIImageView에 전달하기 위해 Delegate 작업을 설정한다.
+이 때 originalCIImage의 nil 여부를 체크하는 목적은 갤러리에서 새로 선택한 이미지는 이전에 할당된 데이터를 지우려는 것이다.
+
+필터 데이터를 적용할 때 다음과 같은 분기 사항이 나타날 수 있다.
+- 갤러리에서 이미지를 선택하지 않고 바로 필터 적용을 수행하려는 경우
+- 이미지를 선택한 이후 필터를 적용하지 않고 바로 저장 버튼을 누를 경우
+- 이미지를 선택한 이후 필터 적용을 두 번 이상 수행할 경우
+
+이를 해결하기 위해 originalCIImage와 currentImageData를 활용한다.
+유저가 필터 적용을 누를 때마다 originalCIImage가 존재하는지 여부를 판단한다. 
+존재할 경우, 이미 유저가 필터 적용을 한 케이스이므로 새로운 필터 데이터를 적용한 뒤, currentImageData에 해당 데이터를 새로이 할당한다.
+존재하지 않을 경우, 유저는 이번에 처음 필터 적용을 하는 케이스이므로 해당 이미지에 다른 필터를 적용해볼 수 있으므로 originalCIImage에 값을 할당한다.
+
+또한 위의 PHPickerViewControllerDelegate에서 설정했듯이, 새로운 이미지를 선택했다면 이전에 선택한 이미지로 생성한 필터 데이터들은 영향을 주면 안되므로 모두 nil을 할당한다.
+
+```swift
+private func applyFilter() {
+	// check selected image from gallery
+        guard let uiImage = albumImageView.image else {
+            print("No UIImage for albumImageView")
+            return
+        }
+
+	// original image's orientation and scale
+        let imageOrientation = uiImage.imageOrientation
+        let imageScale = uiImage.scale
+
+	// check if user already selected filter data
+        if let original = originalCIImage {
+	// UIImage --> CIImage with filter data
+            guard let resultImage = selectedFilter(original) else {
+                print("No Filter to be applied for various filters!!!")
+                return
+            }
+            
+            let finalImage = UIImage(ciImage: resultImage, scale: imageScale, orientation: imageOrientation)
+
+	    // jpeg data from UIImage with 70% compression: to be saved in album
+            self.currentImageData = finalImage.jpegData(compressionQuality: 0.7)
+            
+            DispatchQueue.main.async {
+                self.albumImageView.image = finalImage
+            }
+        } else {
+            // user selected filter data for the first time with this image
+            guard let cgIImage = uiImage.cgImage else {
+                print("No CGIImage for UIImage")
+                return
+            }
+            
+            let ciImage = CIImage(cgImage: cgIImage)
+            
+            guard let resultImage = selectedFilter(ciImage) else {
+                print("No Filter to be applied")
+                return
+            }
+
+            // save original image's data in case user select other filter data for same image
+            self.originalCIImage = ciImage
+            
+            let finalImage = UIImage(ciImage: resultImage, scale: imageScale, orientation: imageOrientation)
+            
+            self.currentImageData = finalImage.jpegData(compressionQuality: 0.7)
+            
+            DispatchQueue.main.async {
+                self.albumImageView.image = finalImage
+            }
+        }
+    }
+```
+
+### 3.0 시점에서 해당 버전으로 업데이트한 기기가 전세계 1000건이 넘어가는 것으로 보아 앱에 추가해볼 수 있는 사항으로는 Localized String 적용을 해보아야 할 것으로 보인다. 또한 고도화 작업이 더 필요할 경우, 아예 Storyboard 기반에서 코드 기반으로 Refactoring 하면서 사진 여러장을 갤러리에서 선택할 수 있도록 구성을 해볼 예정이다.
