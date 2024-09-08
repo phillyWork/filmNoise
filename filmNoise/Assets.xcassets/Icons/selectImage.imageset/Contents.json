@@ -1,0 +1,22 @@
+{
+  "images" : [
+    {
+      "filename" : "landscape-2--photos-photo-landscape-picture-photography-camera-pictures-image.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "landscape-2--photos-photo-landscape-picture-photography-camera-pictures-image2.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

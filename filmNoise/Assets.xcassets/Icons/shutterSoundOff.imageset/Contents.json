@@ -1,0 +1,22 @@
+{
+  "images" : [
+    {
+      "filename" : "volume-mute--speaker-remove-volume-control-audio-music-mute-off-cross-entertainment.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "volume-mute--speaker-remove-volume-control-audio-music-mute-off-cross-entertainment2.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
