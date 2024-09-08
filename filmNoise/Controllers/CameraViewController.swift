@@ -29,18 +29,15 @@ final class CameraViewController: UIViewController {
     @IBOutlet weak var flashButton: UIButton!
     @IBOutlet weak var timeStampButton: UIButton!
     @IBOutlet weak var cameraLensButton: UIButton!
+    @IBOutlet weak var shutterSoundButton: UIButton!
     @IBOutlet weak var filterCollectionView: UICollectionView!
-    
     
     //MARK: - Filters
     
     //선택한 필터 담을 var
     private var selectedFilter: (CIImage) -> CIImage? = FilterFunctions.original(ciImage:)
     
-    private var selectedFilterLabel: String = "original"
-    
     private var filterManager = FilterDataManager()
-    
     
     //MARK: - Variable for Camera Sessions
     
@@ -75,6 +72,8 @@ final class CameraViewController: UIViewController {
     private var data: Data?
     
     private var isZoomIn = false
+    
+    private var isShutterSoundOn = true
     
     private var indicator: NVActivityIndicatorView!
 
@@ -131,6 +130,9 @@ final class CameraViewController: UIViewController {
         
         timeStampButton.setImage(UIImage(named: "stampOff"), for: .normal)
         timeStampButton.contentMode = .scaleAspectFill
+        
+        shutterSoundButton.setImage(UIImage(named: "shutterSoundOn"), for: .normal)
+        shutterSoundButton.contentMode = .scaleAspectFill
         
         cameraLensButton.setImage(UIImage(named: "wideAngle"), for: .normal)
         cameraLensButton.contentMode = .scaleAspectFill
@@ -745,6 +747,25 @@ final class CameraViewController: UIViewController {
         Analytics.logEvent(event, parameters: parameters)
     }
     
+    @IBAction func shutterSoundButtonTapped(_ sender: UIButton) {
+        isShutterSoundOn.toggle()
+        
+        DispatchQueue.main.async {
+            self.isShutterSoundOn ? self.shutterSoundButton.setImage(UIImage(named: "shutterSoundOn"), for: .normal) : self.shutterSoundButton.setImage(UIImage(named: "shutterSoundOff"), for: .normal)
+        }
+        
+        let event = "shutterSoundButton"
+        let parameters = [
+            "file": #file,
+            "function": #function
+        ]
+        
+        Analytics.setUserID("userID = \(1234)")
+        Analytics.setUserProperty("ko", forName: "country")
+        Analytics.logEvent(AnalyticsEventSelectItem, parameters: nil) // select_item으로 로깅
+        Analytics.logEvent(event, parameters: parameters)
+    }
+    
     //화면 tap --> focus 잡기
     @IBAction func TapScreenToFocus(_ sender: UITapGestureRecognizer) {
         if sender.state == .ended {
@@ -864,6 +885,19 @@ extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 extension CameraViewController: AVCapturePhotoCaptureDelegate {
     
+    //MARK: - check for sound
+    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if !isShutterSoundOn {
+            AudioServicesDisposeSystemSoundID(1108)
+        }
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if !isShutterSoundOn {
+            AudioServicesDisposeSystemSoundID(1108)
+        }
+    }
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         //error 체크
         guard error == nil else {
@@ -911,7 +945,7 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         }
         
         //Photo Library 접근 허용 확인
-        PHPhotoLibrary.requestAuthorization { status in
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
             guard status == .authorized else {
                 self.showPhotoSavePermissionAlert()
                 return

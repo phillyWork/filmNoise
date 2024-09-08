@@ -23,6 +23,8 @@
 		21507E4F29A7109E0029B088 /* AgfaAPX400.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21507E4E29A7109E0029B088 /* AgfaAPX400.metal */; };
 		216BAAF529AC49C200199821 /* EvangelionFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216BAAF429AC49C200199821 /* EvangelionFilter.swift */; };
 		216BAAF729AC49CB00199821 /* Evangelion.metal in Sources */ = {isa = PBXBuildFile; fileRef = 216BAAF629AC49CB00199821 /* Evangelion.metal */; };
+		216E00F72C8DE53C00A3D3FA /* AlbumFilterCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216E00F62C8DE53C00A3D3FA /* AlbumFilterCollectionCell.swift */; };
+		216E00F92C8DE56100A3D3FA /* AlbumImageFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216E00F82C8DE56100A3D3FA /* AlbumImageFilterViewController.swift */; };
 		219C7591299BE03600193DD6 /* FilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */; };
 		21B7C3B829A1339A00CA9CD2 /* FilterFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B7C3B729A1339A00CA9CD2 /* FilterFunctions.swift */; };
 		21C39C1029978EED00A17F80 /* FilterData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C39C0F29978EED00A17F80 /* FilterData.swift */; };
@@ -53,6 +55,8 @@
 		21507E4E29A7109E0029B088 /* AgfaAPX400.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AgfaAPX400.metal; sourceTree = "<group>"; };
 		216BAAF429AC49C200199821 /* EvangelionFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvangelionFilter.swift; sourceTree = "<group>"; };
 		216BAAF629AC49CB00199821 /* Evangelion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Evangelion.metal; sourceTree = "<group>"; };
+		216E00F62C8DE53C00A3D3FA /* AlbumFilterCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumFilterCollectionCell.swift; sourceTree = "<group>"; };
+		216E00F82C8DE56100A3D3FA /* AlbumImageFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumImageFilterViewController.swift; sourceTree = "<group>"; };
 		219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCollectionViewCell.swift; sourceTree = "<group>"; };
 		21B7C3B729A1339A00CA9CD2 /* FilterFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterFunctions.swift; sourceTree = "<group>"; };
 		21C39C0F29978EED00A17F80 /* FilterData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterData.swift; sourceTree = "<group>"; };
@@ -82,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				212B7A71298F82E900B228AF /* CameraViewController.swift */,
+				216E00F82C8DE56100A3D3FA /* AlbumImageFilterViewController.swift */,
 				211142F02991406600D3A996 /* CameraFilterTableViewController.swift */,
 				211142F22991596900D3A996 /* CameraFilterViewController.swift */,
 			);
@@ -93,6 +98,7 @@
 			children = (
 				212B7A73298F82E900B228AF /* Main.storyboard */,
 				212988E829924B67003607D9 /* CustomTableViewCell.swift */,
+				216E00F62C8DE53C00A3D3FA /* AlbumFilterCollectionCell.swift */,
 				219C7590299BE03600193DD6 /* FilterCollectionViewCell.swift */,
 			);
 			path = Views;
@@ -313,8 +319,10 @@
 				21B7C3B829A1339A00CA9CD2 /* FilterFunctions.swift in Sources */,
 				21C39C1029978EED00A17F80 /* FilterData.swift in Sources */,
 				216BAAF729AC49CB00199821 /* Evangelion.metal in Sources */,
+				216E00F72C8DE53C00A3D3FA /* AlbumFilterCollectionCell.swift in Sources */,
 				212B7A6E298F82E800B228AF /* AppDelegate.swift in Sources */,
 				212B7A70298F82E900B228AF /* SceneDelegate.swift in Sources */,
+				216E00F92C8DE56100A3D3FA /* AlbumImageFilterViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,7 +497,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.0;
+				MARKETING_VERSION = 3.0.0;
 				MTLLINKER_FLAGS = "-fcikernel";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phillyham24.filmNoise;
@@ -528,7 +536,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.0;
+				MARKETING_VERSION = 3.0.0;
 				MTLLINKER_FLAGS = "-fcikernel";
 				PRODUCT_BUNDLE_IDENTIFIER = com.phillyham24.filmNoise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
